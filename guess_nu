@@ -10,14 +10,17 @@
   close FP;
   print "Golden: @golden\n";
   ### Test pattern
-  my @default_pattern = (1423,4567,7890);
-  my @target = split //, $golden[0];
-  my @pattern = split //, $default_pattern[0];
-  print "@target\n";
-  print "@pattern\n";
-  my @map_a = map {($target[$_] =~ /$pattern[$_]/)?($pattern[$_]):("X")} 0..$#target;
-  my @nu_a = map {/\d/} @map_a;
-  my @grep_b = grep {$_ ~~ @pattern} @target;
-  print "map: @map_a\n";
-  print "grep_b: @grep_b\n";
-  print $#nu_a+1, "A", $#grep_b+1, "B\n";
+  my @default_pattern = (3241,4567,7890);
+  print "Test pattern: $default_pattern[0]\n";
+  print &your_result($golden[0], $default_pattern[0]), "\n";
+
+
+  sub your_result {
+    my $i = shift @_;
+    my $j = shift @_;
+    my @ary_i = split //, $i;
+    my @ary_j = split //, $j;
+    my @a = map {$ary_i[$_]=~/$ary_j[$_]/} 0..$#ary_i;
+    my @b = grep {$_ ~~ @ary_j} @ary_i;
+    my $str = $#a+1, "A", abs($#b-$#a), "B";
+  }
