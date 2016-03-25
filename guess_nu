@@ -11,15 +11,13 @@
   print "Golden: @golden\n";
   ### Test pattern
   my @default_pattern = (3241,4567,7890);
-  print "Test pattern: $default_pattern[0]\n";
-  print &your_result($golden[0], $default_pattern[0]), "\n";
+  print "Test pattern: $default_pattern[1]\n";
+  print &your_result($golden[0], $default_pattern[1]), "\n";
 
 
   sub your_result {
-    my $i = shift @_;
-    my $j = shift @_;
-    my @ary_i = split //, $i;
-    my @ary_j = split //, $j;
+    my @ary_i = split //, shift @_;
+    my @ary_j = split //, shift @_;
     my @a = map {$ary_i[$_]=~/$ary_j[$_]/} 0..$#ary_i;
     my @b = grep {$_ ~~ @ary_j} @ary_i;
     my $str = $#a+1, "A", abs($#b-$#a), "B";
