@@ -13,3 +13,10 @@ amount of total iteration.
 ./guess_nu
 ```
 
+# Reviews
+1.  Unique array
+    ```perl
+    my @ary = (1,2,3,2,3);
+    my %seen;
+    my @uniq = grep !$seen{$_}++ @ary;
+    ```

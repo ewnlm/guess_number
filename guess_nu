@@ -1,2 +1,19 @@
 #!/usr/bin/perl -w
   use strict;
+  my @golden;
+  open FP, "golden.txt";
+  while(<FP>) {
+    chomp($_);
+    push @golden, $_;
+  }
+  close FP;
+  print "@golden\n";
+  ### 1. Get the initial pattern
+  my @ary = (1,2,3,2,3);
+  print "@ary\n";
+  my %seen;
+  my @new = grep $seen{$_}++, @ary;
+  print "@new\n";
+  ###
+  my $str = join '', @new;
+  print "str: $str\n";
