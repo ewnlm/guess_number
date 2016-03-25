@@ -7,13 +7,10 @@
     push @golden, $_;
   }
   close FP;
-  print "@golden\n";
-  ### 1. Get the initial pattern
-  my @ary = (1,2,3,2,3);
-  print "@ary\n";
-  my %seen;
-  my @new = grep $seen{$_}++, @ary;
-  print "@new\n";
-  ###
-  my $str = join '', @new;
-  print "str: $str\n";
+  print "Golden: @golden\n";
+  ### Test pattern
+  my @default_pattern = (1234,4567,7890);
+  my @target = split //, $golden[0];
+  my @pattern = split //, $default_pattern[0];
+  print "@target\n";
+  print "@pattern\n";
