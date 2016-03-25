@@ -1,5 +1,6 @@
 #!/usr/bin/perl -w
   use strict;
+  use experimental 'smartmatch';
   my @golden;
   open FP, "golden.txt";
   while(<FP>) {
@@ -9,8 +10,14 @@
   close FP;
   print "Golden: @golden\n";
   ### Test pattern
-  my @default_pattern = (1234,4567,7890);
+  my @default_pattern = (1423,4567,7890);
   my @target = split //, $golden[0];
   my @pattern = split //, $default_pattern[0];
   print "@target\n";
   print "@pattern\n";
+  my @map_a = map {($target[$_] =~ /$pattern[$_]/)?($pattern[$_]):("X")} 0..$#target;
+  my @nu_a = map {/\d/} @map_a;
+  my @grep_b = grep {$_ ~~ @pattern} @target;
+  print "map: @map_a\n";
+  print "grep_b: @grep_b\n";
+  print $#nu_a+1, "A", $#grep_b+1, "B\n";
