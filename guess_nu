@@ -10,9 +10,24 @@
   close FP;
   print "Golden: @golden\n";
   ### Test pattern
-  my @default_pattern = (3241,4567,7890);
-  print "Test pattern: $default_pattern[1]\n";
-  print &your_result($golden[0], $default_pattern[1]), "\n";
+  my @test_pattern = (1234,4567,7890);
+  print "Test pattern: $test_pattern[1]\n";
+  print &your_result($golden[0], $test_pattern[1]), "\n";
+  ### Find the maximun A and B
+  for my $goal(@golden) {
+    my %score_board;
+    for my $pat(@test_pattern) {
+      my $AB = &your_result($goal, $pat);
+      print "AB: $AB\n";
+      print "The pattern: $pat, ($goal), then AB: $AB\n";
+      my @AB_weight = split /[A|B]/, $AB;
+      print "AB weight: @AB_weight\n";
+      for my $i(keys %score_board) {
+	print "pat: $i, $score_board{$i}\n";
+      }
+    }
+  }
+
 
 
   sub your_result {
@@ -20,5 +35,7 @@
     my @ary_j = split //, shift @_;
     my @a = map {$ary_i[$_]=~/$ary_j[$_]/} 0..$#ary_i;
     my @b = grep {$_ ~~ @ary_j} @ary_i;
-    my $str = $#a+1, "A", abs($#b-$#a), "B";
+    print "A dimension: $#a\n";
+    my $str = abs($#a+1), "A", abs($#b-$#a), "B";
+    print "subfunc: $str\n";
   }
