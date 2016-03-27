@@ -2,6 +2,8 @@
   use strict;
   use experimental 'smartmatch';
   my @golden;
+  my $iter;
+  my %score_board;
   open FP, "golden.txt";
   while(<FP>) {
     chomp($_);
@@ -11,21 +13,27 @@
   print "Golden: @golden\n";
   ### Test pattern
   my @test_pattern = (1234,4567,7890);
-  print "Test pattern: $test_pattern[1]\n";
-  print &your_result($golden[0], $test_pattern[1]), "\n";
   ### Find the maximun A and B
-  for my $goal(@golden) {
-    my %score_board;
+  PATTERN: for my $goal(@golden) {
+    %score_board = ();
+    $iter = 0;
     for my $pat(@test_pattern) {
       my $AB = &your_result($goal, $pat);
-      print "AB: $AB\n";
-      print "The pattern: $pat, ($goal), then AB: $AB\n";
-      my @AB_weight = split /[A|B]/, $AB;
-      print "AB weight: @AB_weight\n";
-      for my $i(keys %score_board) {
-	print "pat: $i, $score_board{$i}\n";
+      $score_board{$pat}{result} = $AB;
+      $iter++;
+      my @weight = split /[A|B]/, $AB;
+      last MATCH, if($weight[0]==4);
+      map {$score_board{$pat}{weight}+=$_} @weight;
+    }
+    my @priority = sort {$score_board{$a}{weight}<=>$score_board{$b}{weight}} @test_pattern;
+    print "Priority: @priority\n";
+    for my $i(keys %score_board) {
+      for my $item(keys %{$score_board{$i}}) {
+	print "$i, $item, $score_board{$i}{$item}\n";
       }
     }
+    MATCH:
+    #print "Completely Match. Golden: $goal, Iteration: $iter\n";
   }
 
 
@@ -35,7 +43,7 @@
     my @ary_j = split //, shift @_;
     my @a = map {$ary_i[$_]=~/$ary_j[$_]/} 0..$#ary_i;
     my @b = grep {$_ ~~ @ary_j} @ary_i;
-    print "A dimension: $#a\n";
-    my $str = abs($#a+1), "A", abs($#b-$#a), "B";
-    print "subfunc: $str\n";
+    my $A = ($#a<0)?(0):($#a+1);
+    my $B = ($#b<0)?(0):(abs($#b-$#a));
+    my $str = "$A"."A$B"."B";
   }
