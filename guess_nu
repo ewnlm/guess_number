@@ -2,9 +2,8 @@
   use strict;
   use experimental 'smartmatch';
   my @golden;
-  my $iter;
-  my @answer = 1..4;
-  my (@un_test, @tested, @unsuccessful);
+  my ($iter, $AB);
+  my (@answer, @un_test, @tested, @unsuccessful);
   open FP, "golden.txt";
   while(<FP>) {
     chomp($_);
@@ -13,7 +12,13 @@
   close FP;
 
   for my $goal(@golden) {
+    @anser = 1..4;
+    $iter = 0;
+    $AB = &your_result($goal, join "", @answer);
+    print "$AB\n";
+    do {
 
+    } while($iter<3)
   }
 
 
