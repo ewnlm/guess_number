@@ -3,37 +3,17 @@
   use experimental 'smartmatch';
   my @golden;
   my $iter;
-  my %score_board;
+  my @answer = 1..4;
+  my (@un_test, @tested, @unsuccessful);
   open FP, "golden.txt";
   while(<FP>) {
     chomp($_);
     push @golden, $_;
   }
   close FP;
-  print "Golden: @golden\n";
-  ### Test pattern
-  my @test_pattern = (1234,4567,7890);
-  ### Find the maximun A and B
-  PATTERN: for my $goal(@golden) {
-    %score_board = ();
-    $iter = 0;
-    for my $pat(@test_pattern) {
-      my $AB = &your_result($goal, $pat);
-      $score_board{$pat}{result} = $AB;
-      $iter++;
-      my @weight = split /[A|B]/, $AB;
-      last MATCH, if($weight[0]==4);
-      map {$score_board{$pat}{weight}+=$_} @weight;
-    }
-    my @priority = sort {$score_board{$a}{weight}<=>$score_board{$b}{weight}} @test_pattern;
-    print "Priority: @priority\n";
-    for my $i(keys %score_board) {
-      for my $item(keys %{$score_board{$i}}) {
-	print "$i, $item, $score_board{$i}{$item}\n";
-      }
-    }
-    MATCH:
-    #print "Completely Match. Golden: $goal, Iteration: $iter\n";
+
+  for my $goal(@golden) {
+
   }
 
 
