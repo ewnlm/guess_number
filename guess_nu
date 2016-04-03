@@ -3,7 +3,7 @@
   use experimental 'smartmatch';
   my @golden;
   my ($iter, $AB);
-  my (@prev_weight, @weight, @testing, @answer, @un_test, @tested, @unsuccessful);
+  my (@mask, @prev_weight, @weight, @testing, @answer, @un_test, @tested, @unsuccessful);
   open FP, "golden.txt";
   while(<FP>) {
     chomp($_);
@@ -13,6 +13,7 @@
 
   for my $goal(@golden) {
     @answer = 1..4;
+    @mask = (0, 0, 0, 0);
     @testing = @answer;
     @prev_weight = (0,0);
     @un_test = grep {!($_~~ @answer)} 0..9;
@@ -23,10 +24,16 @@
     do {
       @weight = split /[A|B]/, $AB;
       my $toal_weight = $weight[0]+$weight[1];
+      ### Filter
+      @testing = map {($mask[$_])?($answer[$_]):($answer[$_])} 0..$#answer;
+      print "testing: @testing\n";
       ### searching
       if($weight[0]>$weight[1]) { # More match and correct
 	my $positively = $weight[0]-$prev_weight[0];
-	if($positively>=0) {
+
+	if($positively>0) {
+
+	} elsif($positively==0) {
 
 	} else {
 
@@ -36,7 +43,7 @@
       @prev_weight = @weight;
       $AB = &your_result($goal, join "", @testing);
 
-    } while($iter<3) # $weight[0]==4
+    } while($iter<2) # $weight[0]==4
   }
 
 
