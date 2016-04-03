@@ -3,7 +3,7 @@
   use experimental 'smartmatch';
   my @golden;
   my ($iter, $AB);
-  my (@answer, @un_test, @tested, @unsuccessful);
+  my (@weight, @testing, @answer, @un_test, @tested, @unsuccessful);
   open FP, "golden.txt";
   while(<FP>) {
     chomp($_);
@@ -12,13 +12,24 @@
   close FP;
 
   for my $goal(@golden) {
-    @anser = 1..4;
+    @answer = 1..4;
+    @un_test = grep {!($_~~ @answer)} 0..9;
+    print "un test: @un_test\n";
     $iter = 0;
     $AB = &your_result($goal, join "", @answer);
     print "$AB\n";
     do {
+      @weight = split /[A|B]/, $AB;
+      my $toal_weight = $weight[0]+$weight[1];
+      if($weight[0]>$weight[1]) { # More match and correct
+	if($#tested==-1) {
+	  push @tested, pop @answer;
+	}
+      } else { # match but incorrect
+      }
+      $AB = &your_result($goal, join "", @answer);
 
-    } while($iter<3)
+    } while($iter<3) # $weight[0]==4
   }
 
 
@@ -30,5 +41,6 @@
     my @b = grep {$_ ~~ @ary_j} @ary_i;
     my $A = ($#a<0)?(0):($#a+1);
     my $B = ($#b<0)?(0):(abs($#b-$#a));
+    $iter++;
     my $str = "$A"."A$B"."B";
   }
