@@ -32,6 +32,7 @@
       @prev_weight = @weight;
       $prevs = $currs;
       $AB = &your_result($goal, join "", @testing);
+      print "$AB, $iter\n";
     } while($iter<2) # $weight[0]==4
   }
 
