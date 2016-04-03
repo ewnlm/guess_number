@@ -2,7 +2,7 @@
   use strict;
   use experimental 'smartmatch';
   my @golden;
-  my ($iter, $AB);
+  my ($iter, $AB, $positively, $move, $currs, $prevs);
   my (@mask, @prev_weight, @weight, @testing, @answer, @un_test, @tested, @unsuccessful);
   open FP, "golden.txt";
   while(<FP>) {
@@ -13,7 +13,7 @@
 
   for my $goal(@golden) {
     @answer = 1..4;
-    @mask = (0, 0, 0, 0);
+    @mask = (1, 1, 1, 1);
     @testing = @answer;
     @prev_weight = (0,0);
     @un_test = grep {!($_~~ @answer)} 0..9;
@@ -23,26 +23,15 @@
     print "$AB, $iter\n";
     do {
       @weight = split /[A|B]/, $AB;
-      my $toal_weight = $weight[0]+$weight[1];
+      $move = 4-$weight[0]-$weight[1];
+      $currs = $weight[0]+$weight[1];
       ### Filter
-      @testing = map {($mask[$_])?($answer[$_]):($answer[$_])} 0..$#answer;
+      @testing = map {($mask[$_])?("X"):($answer[$_])} 0..$#answer;
       print "testing: @testing\n";
       ### searching
-      if($weight[0]>$weight[1]) { # More match and correct
-	my $positively = $weight[0]-$prev_weight[0];
-
-	if($positively>0) {
-
-	} elsif($positively==0) {
-
-	} else {
-
-	}
-      } else { # match but incorrect
-      }
       @prev_weight = @weight;
+      $prevs = $currs;
       $AB = &your_result($goal, join "", @testing);
-
     } while($iter<2) # $weight[0]==4
   }
 
