@@ -4,7 +4,7 @@
   my @golden;
   my ($iter, $AB, $positively, $move, $currs, $prevs);
   my (@mask, @prev_weight, @weight, @testing, @answer, @un_test, @tested, @unsuccessful);
-  my (%record);
+  my (%record, @probability);
   open FP, "golden.txt";
   while(<FP>) {
     chomp($_);
@@ -35,9 +35,19 @@
 
       if($currs==0) {
 	push @unsuccessful, @testing;
+	push @unsunccessful, grep {$_ ~~ @testing} @un_test;
+	push @unsunccessful, grep {$_ ~~ @testing} @tested;
+	if($#tested)
+
       }
 
+      if($currs==1) {
 
+      }
+
+      if($currs==4) {
+
+      }
 
       ###
       @prev_weight = @weight;
