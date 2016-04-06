@@ -48,7 +48,13 @@
 
       }
 
+      if($currs==2 or $currs==3) {
+
+      }
+
       if($currs==4) {
+	@probability = ();
+	push @probability, @testing;
 
       }
 
