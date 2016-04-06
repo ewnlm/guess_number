@@ -26,7 +26,6 @@
     print "@testing, ($AB, iter: $iter)\n";
     do {
       @weight = split /[A|B]/, $AB;
-      print "testing idx: $#testing\n";
       $move = 4-$weight[0]-$weight[1];
       $currs = $weight[0]+$weight[1];
       map {push @{$record{$_}}, $testing[$_]} 0..$#testing;
@@ -35,10 +34,14 @@
 
       if($currs==0) {
 	push @unsuccessful, @testing;
-	push @unsunccessful, grep {$_ ~~ @testing} @un_test;
-	push @unsunccessful, grep {$_ ~~ @testing} @tested;
-	if($#tested)
-
+	push @unsuccessful, grep {$_ ~~ @testing} @un_test;
+	push @unsuccessful, grep {$_ ~~ @testing} @tested;
+	my %seen;
+	@unsuccessful = grep {!($seen{$_}++)} @unsuccessful;
+	@testing[0..2] = @unsuccessful[0..2];
+	($#un_test!=-1)?
+	(push @testing, pop @un_test):
+	(push @testing, pop @tested);
       }
 
       if($currs==1) {
