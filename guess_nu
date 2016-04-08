@@ -3,7 +3,8 @@
   use experimental 'smartmatch';
   my @golden;
   my ($iter, $AB, $positively, $move, $currs, $prevs);
-  my (@mask, @prev_weight, @weight, @testing, @answer, @un_test, @tested, @unsuccessful);
+  my (@mask, @prev_weight, @weight, @testing, @answer);
+  my (@un_test, @tested, @unsuccessful);
   my (%record, @probability);
   open FP, "golden.txt";
   while(<FP>) {
@@ -13,16 +14,16 @@
   close FP;
 
   for my $goal(@golden) {
-    @answer = 1..4;
     @mask = (1, 1, 1, 1);
-    @testing = @answer;
+    @answer = qw/X X X X/;
+    @testing = 1..4;
     @prev_weight = (0,0);
     $prevs = 0;
     %record = ();
-    @un_test = grep {!($_~~ @answer)} 0..9;
+    @un_test = grep {!($_~~ @testing)} 0..9;
     #print "un test: @un_test\n";
     $iter = 0;
-    $AB = &your_result($goal, join "", @answer);
+    $AB = &your_result($goal, join "", @testing);
     print "@testing, ($AB, iter: $iter)\n";
     do {
       @weight = split /[A|B]/, $AB;
@@ -34,14 +35,6 @@
 
       if($currs==0) {
 	push @unsuccessful, @testing;
-	push @unsuccessful, grep {$_ ~~ @testing} @un_test;
-	push @unsuccessful, grep {$_ ~~ @testing} @tested;
-	my %seen;
-	@unsuccessful = grep {!($seen{$_}++)} @unsuccessful;
-	@testing[0..2] = @unsuccessful[0..2];
-	($#un_test!=-1)?
-	(push @testing, pop @un_test):
-	(push @testing, pop @tested);
       }
 
       if($currs==1) {
@@ -55,8 +48,11 @@
       if($currs==4) {
 	@probability = ();
 	push @probability, @testing;
-
       }
+
+      ### filter
+      my %seen = ();
+      @unsuccessful = grep {!($seen{$_}++)} @unsuccessful;
 
       ###
       @prev_weight = @weight;
