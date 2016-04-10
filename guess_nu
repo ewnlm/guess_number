@@ -5,7 +5,7 @@
   my ($iter, $AB, $positively, $move, $currs, $prevs);
   my (@mask, @prev_weight, @weight, @testing, @answer);
   my (@un_test, @tested, @unsuccessful);
-  my (%record, @probability);
+  my (%record, @probability, %removed);
   open FP, "golden.txt";
   while(<FP>) {
     chomp($_);
@@ -26,15 +26,36 @@
     $AB = &your_result($goal, join "", @testing);
     print "@testing, ($AB, iter: $iter)\n";
     do {
+      ### Get result
       @weight = split /[A|B]/, $AB;
       $move = 4-$weight[0]-$weight[1];
       $currs = $weight[0]+$weight[1];
+      ### Record
       map {push @{$record{$_}}, $testing[$_]} 0..$#testing;
       push @{$record{4}}, $currs;
-      ### Processing @testing
 
+      ### Processing @testing
       if($currs==0) {
 	push @unsuccessful, @testing;
+	for my $i(0..$#testing) {
+	  $removed{$i}=$testing{$i};
+	}
+
+	if($prevs>$currs) {
+	  if($prev_weight[0]>$curr_weight[0]) {
+	    for my $i(keys %removed) {
+	      $answer[$i] = $removed[$i];
+	    }
+	  } elsif($prev_weight[1]>$curr_weight[1]) {
+	    for my $i(keys %removed) {
+	      push @candidate, $removed{$i};
+	    }
+	  }
+	}
+
+	if()
+
+
       }
 
       if($currs==1) {
@@ -50,6 +71,7 @@
 	push @probability, @testing;
       }
 
+
       ### filter
       my %seen = ();
       @unsuccessful = grep {!($seen{$_}++)} @unsuccessful;
@@ -57,6 +79,7 @@
       ###
       @prev_weight = @weight;
       $prevs = $currs;
+      %removed = ();
       $AB = &your_result($goal, join "", @testing);
       print "@testing, ($AB, iter: $iter)\n";
     } while($iter<2); # $weight[0]==4
