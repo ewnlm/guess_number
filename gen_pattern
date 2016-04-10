@@ -1,2 +1,8 @@
 #!/usr/bin/perl -w
   use strict;
+  for my $i(123...9999) {
+    my @digit = split //, sprintf("%04d", $i);
+    my %seen = ();
+    my @repeat = grep {($seen{$_}++)} @digit; 
+    print join "", @digit, "\n", if($#repeat==-1);
+  }
