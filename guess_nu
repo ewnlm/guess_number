@@ -43,11 +43,11 @@
 	}
 	### Processing @answer @candidate
 	if($prevs>$currs) {
-	  if($prev_weight[0]>$curr_weight[0] && exists $removed{$iter-1}) {
+	  if($prev_weight[0]>$curr_weight[0] and exists $removed{$iter-1}) {
 	    for my $i(keys %{$removed{$iter-1}}) {
 	      $answer[$i] = $removed{$iter-1}{$i};
 	    }
-	  } elsif($prev_weight[1]>$curr_weight[1] %% exists $removed{$iter-1}) {
+	  } elsif($prev_weight[1]>$curr_weight[1] and exists $removed{$iter-1}) {
 	    for my $i(keys %{$removed{$iter-1}}) {
 	      push @candidate, $removed{$iter-1}{$i};
 	    }
@@ -80,16 +80,24 @@
 	  }
 	  if($prev_weight[1] > $curr_weight[1]) {
 	    for my $i(keys %{$removed{$iter-1}}) {
-	      push @candidate; $removed{$iter-1}{$i};
+	      push @candidate, $removed{$iter-1}{$i};
 	    }
 	  }
 	} elsif($prevs < $currs) {
 	  ### impossible
 	} else {
-	  if(exists $removed{$iter-1})
+	  if($curr_weight[0]==$prev_weight[0] and exists $remove{$iter-1}) {
+	    for my $i(keys %{$removed{$iter-1}}) {
+	      push @unsuccessful, $removed{$iter-1}{$i};
+	    }
+	  } else { ### 0A1B > 1A0B or 1A0B > 0A1B
+	    for my $i(keys %{$stayed{$iter-1}} and exists $stayed{$iter-1}) {
+	      push @unsuccessful, $stayed{$iter-1}{$i};
+	    }
+	  }
 	}
-
 	### Processing $removed{$iter} and $stayed{$iter}
+	
       }
 
       if($currs==2 or $currs==3) {
