@@ -3,9 +3,9 @@
   use experimental 'smartmatch';
   my @golden;
   my ($iter, $AB, $positively, $move, $currs, $prevs);
-  my (@mask, @prev_weight, @weight, @testing, @answer);
+  my (@mask, @prev_weight, @curr_weight, @testing, @answer);
   my (@un_test, @tested, @unsuccessful);
-  my (%record, @probability, %removed);
+  my (%record, @candidate, %removed, %stayed);
   open FP, "golden.txt";
   while(<FP>) {
     chomp($_);
@@ -20,6 +20,8 @@
     @prev_weight = (0,0);
     $prevs = 0;
     %record = ();
+    %removed = ();
+    %stayed = ();
     @un_test = grep {!($_~~ @testing)} 0..9;
     #print "un test: @un_test\n";
     $iter = 0;
@@ -27,39 +29,67 @@
     print "@testing, ($AB, iter: $iter)\n";
     do {
       ### Get result
-      @weight = split /[A|B]/, $AB;
-      $move = 4-$weight[0]-$weight[1];
-      $currs = $weight[0]+$weight[1];
+      @curr_weight = split /[A|B]/, $AB;
+      $move = 4-$curr_weight[0]-$curr_weight[1];
+      $currs = $curr_weight[0]+$curr_weight[1];
       ### Record
       map {push @{$record{$_}}, $testing[$_]} 0..$#testing;
       push @{$record{4}}, $currs;
-
-      ### Processing @testing
+      ### 0A0B condition
       if($currs==0) {
 	push @unsuccessful, @testing;
 	for my $i(0..$#testing) {
-	  $removed{$i}=$testing{$i};
+	  $removed{$iter}{$i}=$testing[$i];
 	}
-
+	### Processing @answer @candidate
 	if($prevs>$currs) {
-	  if($prev_weight[0]>$curr_weight[0]) {
-	    for my $i(keys %removed) {
-	      $answer[$i] = $removed[$i];
+	  if($prev_weight[0]>$curr_weight[0] && exists $removed{$iter-1}) {
+	    for my $i(keys %{$removed{$iter-1}}) {
+	      $answer[$i] = $removed{$iter-1}{$i};
 	    }
-	  } elsif($prev_weight[1]>$curr_weight[1]) {
-	    for my $i(keys %removed) {
-	      push @candidate, $removed{$i};
+	  } elsif($prev_weight[1]>$curr_weight[1] %% exists $removed{$iter-1}) {
+	    for my $i(keys %{$removed{$iter-1}}) {
+	      push @candidate, $removed{$iter-1}{$i};
 	    }
 	  }
 	}
-
-	if()
-
-
+	#print "answer: @answer\n";
+	#print "candidate: @candidate\n";
+	#print "un test: @un_test\n";
+	#print "tested: @tested\n";
+	### Processing @testing
+	for my $i(0..$#answer) {
+	  if($answer[$i]!~/X/) {
+	    $testing[$i] = $answer[$i]
+	  } elsif($#candidate!=-1) {
+	    $testing[$i] = pop @candidate;
+	  } elsif($#un_test!=-1) {
+	    $testing[$i] = pop @un_test;
+	  } else {
+	    $testing[$i] = pop @tested;
+	  }
+	}
       }
-
+      ### 0A1B 1A0B conditions
       if($currs==1) {
+	if($prevs > $currs) {
+	  if($prev_weight[0] > $curr_weight[0]) {
+	    for my $i(keys %{$removed{$iter-1}}) {
+	      $answer[$i] = $removed{$iter-1}{$i};
+	    }
+	  }
+	  if($prev_weight[1] > $curr_weight[1]) {
+	    for my $i(keys %{$removed{$iter-1}}) {
+	      push @candidate; $removed{$iter-1}{$i};
+	    }
+	  }
+	} elsif($prevs < $currs) {
+	  ### impossible
+	} else {
+	  if(exists $removed{$iter-1})
+	}
 
+	### Processing $removed{$iter} and $stayed{$iter}
       }
 
       if($currs==2 or $currs==3) {
@@ -67,22 +97,20 @@
       }
 
       if($currs==4) {
-	@probability = ();
-	push @probability, @testing;
+	@candidate = ();
+	push @candidate, @testing;
       }
-
 
       ### filter
       my %seen = ();
       @unsuccessful = grep {!($seen{$_}++)} @unsuccessful;
 
       ###
-      @prev_weight = @weight;
+      @prev_weight = @curr_weight;
       $prevs = $currs;
-      %removed = ();
       $AB = &your_result($goal, join "", @testing);
       print "@testing, ($AB, iter: $iter)\n";
-    } while($iter<2); # $weight[0]==4
+    } while($iter<2); # $curr_weight[0]==4
 
     for my $i(sort keys %record) {
       print "Record: $i, @{$record{$i}}\n";
