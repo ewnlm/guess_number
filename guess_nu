@@ -27,9 +27,9 @@
     $iter = 0;
     $AB = &your_result($goal, join "", @testing);
     print "@testing, ($AB, iter: $iter)\n";
+    @curr_weight = split /[A|B]/, $AB;
     do {
       ### Get result
-      @curr_weight = split /[A|B]/, $AB;
       $move = 4-$curr_weight[0]-$curr_weight[1];
       $currs = $curr_weight[0]+$curr_weight[1];
       ### Record
@@ -86,7 +86,7 @@
 	} elsif($prevs < $currs) {
 	  ### impossible
 	} else {
-	  if($curr_weight[0]==$prev_weight[0] and exists $remove{$iter-1}) {
+	  if($curr_weight[0]==$prev_weight[0] and exists $removed{$iter-1}) {
 	    for my $i(keys %{$removed{$iter-1}}) {
 	      push @unsuccessful, $removed{$iter-1}{$i};
 	    }
@@ -117,6 +117,7 @@
       @prev_weight = @curr_weight;
       $prevs = $currs;
       $AB = &your_result($goal, join "", @testing);
+      @curr_weight = split /[A|B]/, $AB;
       print "@testing, ($AB, iter: $iter)\n";
     } while($iter<2); # $curr_weight[0]==4
 
