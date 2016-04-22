@@ -5,7 +5,7 @@
   my ($iter, $AB, $positively, $move, $currs, $prevs);
   my (@mask, @prev_weight, @curr_weight, @testing, @answer);
   my (@un_test, @tested, @unsuccessful);
-  my (%record, @candidate, %removed, %stayed);
+  my (%record, %candidate, %removed, %stayed);
   open FP, "golden.txt";
   while(<FP>) {
     chomp($_);
@@ -49,15 +49,10 @@
 	    }
 	  } elsif($prev_weight[1]>$curr_weight[1] and exists $removed{$iter-1}) {
 	    for my $i(keys %{$removed{$iter-1}}) {
-	      push @candidate, $removed{$iter-1}{$i};
+	      push @{$candidate{$i}}, $removed{$iter-1}{$i};
 	    }
 	  }
 	}
-	#print "answer: @answer\n";
-	#print "candidate: @candidate\n";
-	#print "un test: @un_test\n";
-	#print "tested: @tested\n";
-	### Processing @testing
 	for my $i(0..$#answer) {
 	  if($answer[$i]!~/X/) {
 	    $testing[$i] = $answer[$i]
@@ -74,19 +69,28 @@
       if($currs==1) {
 	if($prevs > $currs) {
 	  if($prev_weight[0] > $curr_weight[0]) {
-	    for my $i(keys %{$removed{$iter-1}}) {
-	      $answer[$i] = $removed{$iter-1}{$i};
+	    for my $i(0..$#answer) {
+	      if(exists $removed{$iter-1}{$i}) {
+		$answer[$i] = $removed{$iter-1}{$i};
+		$testing[$i] = $removed{$iter-1}{$i};
+	      } else {
+
+	      }
 	    }
+
 	  }
 	  if($prev_weight[1] > $curr_weight[1]) {
 	    for my $i(keys %{$removed{$iter-1}}) {
 	      push @candidate, $removed{$iter-1}{$i};
 	    }
 	  }
+	  ### Pick 2 digits
 	} elsif($prevs < $currs) {
 	  ### impossible
+	  $testing[0] = pop @un_test;
+	  $testing[1] = pop @un_test;
 	} else {
-	  if($curr_weight[0]==$prev_weight[0] and exists $removed{$iter-1}) {
+	  if(@curr_weight~~@prev_weight and exists $removed{$iter-1}) {
 	    for my $i(keys %{$removed{$iter-1}}) {
 	      push @unsuccessful, $removed{$iter-1}{$i};
 	    }
@@ -95,6 +99,7 @@
 	      push @unsuccessful, $stayed{$iter-1}{$i};
 	    }
 	  }
+	  ### Pick 2 digits
 	}
 	### Processing $removed{$iter} and $stayed{$iter}
 	
