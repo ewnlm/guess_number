@@ -37,86 +37,19 @@
       push @{$record{4}}, $currs;
       ### 0A0B condition
       if($currs==0) {
-	push @unsuccessful, @testing;
-	for my $i(0..$#testing) {
-	  $removed{$iter}{$i}=$testing[$i];
-	}
-	### Processing @answer @candidate
-	if($prevs>$currs) {
-	  if($prev_weight[0]>$curr_weight[0] and exists $removed{$iter-1}) {
-	    for my $i(keys %{$removed{$iter-1}}) {
-	      $answer[$i] = $removed{$iter-1}{$i};
-	    }
-	  } elsif($prev_weight[1]>$curr_weight[1] and exists $removed{$iter-1}) {
-	    for my $i(keys %{$removed{$iter-1}}) {
-	      push @{$candidate{$i}}, $removed{$iter-1}{$i};
-	    }
-	  }
-	}
-	for my $i(0..$#answer) {
-	  if($answer[$i]!~/X/) {
-	    $testing[$i] = $answer[$i]
-	  } elsif($#candidate!=-1) {
-	    $testing[$i] = pop @candidate;
-	  } elsif($#un_test!=-1) {
-	    $testing[$i] = pop @un_test;
-	  } else {
-	    $testing[$i] = pop @tested;
-	  }
 	}
       }
       ### 0A1B 1A0B conditions
       if($currs==1) {
-	if($prevs > $currs) {
-	  if($prev_weight[0] > $curr_weight[0]) {
-	    for my $i(0..$#answer) {
-	      if(exists $removed{$iter-1}{$i}) {
-		$answer[$i] = $removed{$iter-1}{$i};
-		$testing[$i] = $removed{$iter-1}{$i};
-	      } else {
-
-	      }
-	    }
-
-	  }
-	  if($prev_weight[1] > $curr_weight[1]) {
-	    for my $i(keys %{$removed{$iter-1}}) {
-	      push @candidate, $removed{$iter-1}{$i};
-	    }
-	  }
-	  ### Pick 2 digits
-	} elsif($prevs < $currs) {
-	  ### impossible
-	  $testing[0] = pop @un_test;
-	  $testing[1] = pop @un_test;
-	} else {
-	  if(@curr_weight~~@prev_weight and exists $removed{$iter-1}) {
-	    for my $i(keys %{$removed{$iter-1}}) {
-	      push @unsuccessful, $removed{$iter-1}{$i};
-	    }
-	  } else { ### 0A1B > 1A0B or 1A0B > 0A1B
-	    for my $i(keys %{$stayed{$iter-1}} and exists $stayed{$iter-1}) {
-	      push @unsuccessful, $stayed{$iter-1}{$i};
-	    }
-	  }
-	  ### Pick 2 digits
-	}
-	### Processing $removed{$iter} and $stayed{$iter}
-	
       }
 
       if($currs==2 or $currs==3) {
-
       }
 
       if($currs==4) {
 	@candidate = ();
 	push @candidate, @testing;
       }
-
-      ### filter
-      my %seen = ();
-      @unsuccessful = grep {!($seen{$_}++)} @unsuccessful;
 
       ###
       @prev_weight = @curr_weight;
