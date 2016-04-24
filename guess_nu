@@ -2,10 +2,10 @@
   use strict;
   use experimental 'smartmatch';
   my @golden;
-  my ($iter, $AB, $positively, $move, $currs, $prevs);
+  my ($iter, $AB, $positively, $currs, $prevs);
   my (@mask, @prev_weight, @curr_weight, @testing, @answer);
   my (@un_test, @tested, @unsuccessful);
-  my (%record, %candidate, %removed, %stayed);
+  my (@can_ary, %can_record, %removed, %stayed);
   open FP, "golden.txt";
   while(<FP>) {
     chomp($_);
@@ -19,50 +19,32 @@
     @testing = 1..4;
     @prev_weight = (0,0);
     $prevs = 0;
-    %record = ();
     %removed = ();
     %stayed = ();
     @un_test = grep {!($_~~ @testing)} 0..9;
-    #print "un test: @un_test\n";
     $iter = 0;
     $AB = &your_result($goal, join "", @testing);
     print "@testing, ($AB, iter: $iter)\n";
     @curr_weight = split /[A|B]/, $AB;
-    do {
-      ### Get result
-      $move = 4-$curr_weight[0]-$curr_weight[1];
-      $currs = $curr_weight[0]+$curr_weight[1];
-      ### Record
-      map {push @{$record{$_}}, $testing[$_]} 0..$#testing;
-      push @{$record{4}}, $currs;
-      ### 0A0B condition
-      if($currs==0) {
-	}
+    $currs = $curr_weight[0]+$curr_weight[1];
+    while($iter<2) { # $curr_weight[0]==4
+      ### 
+      if($prev_weight[0]>$curr_weight[0]) {
+
       }
-      ### 0A1B 1A0B conditions
-      if($currs==1) {
+      if($prev_weight[1]>$curr_weight[1]) {
+
       }
 
-      if($currs==2 or $currs==3) {
-      }
-
-      if($currs==4) {
-	@candidate = ();
-	push @candidate, @testing;
-      }
 
       ###
       @prev_weight = @curr_weight;
       $prevs = $currs;
       $AB = &your_result($goal, join "", @testing);
       @curr_weight = split /[A|B]/, $AB;
+      $currs = $curr_weight[0]+$curr_weight[1];
       print "@testing, ($AB, iter: $iter)\n";
-    } while($iter<2); # $curr_weight[0]==4
-
-    for my $i(sort keys %record) {
-      print "Record: $i, @{$record{$i}}\n";
     }
-
   }
 
 
