@@ -16,11 +16,11 @@
   for my $goal(@golden) {
     @mask = (0, 0, 0, 0);
     @answer = qw/X X X X/;
-    @testing = 1..4;
+    @testing = 0..3;
     @prev_weight = (0,0);
     $prevs = 0;
-    %removed = ();
-    %stayed = ();
+    #%removed = ();
+    #%stayed = ();
     @un_test = grep {!($_~~ @testing)} 0..9;
     $iter = 0;
     $AB = &your_result($goal, join "", @testing);
@@ -28,40 +28,10 @@
     @curr_weight = split /[A|B]/, $AB;
     $currs = $curr_weight[0]+$curr_weight[1];
     while($iter<2) { # $curr_weight[0]==4
-      ### @answer %candidate and @unsuccessful
       if($currs==0) {
-	push @unsuccessful, @testing;
-      }
-      if($prev_weight[0]>$curr_weight[0]) {
-	my $idx = $removed{$iter-1}{idx};
-	my $val = $removed{$iter-1}{val};
-	$answer[$idx] = $val;
-	delete $candidate{$idx}, if(exists $candidate{$idx});
-      } 
-      if($prev_weight[1]>$curr_weight[1]) {
-	my $idx = $removed{$iter-1}{idx};
-	my $val = $removed{$iter-1}{val};
-	$candidate{$idx}{$val}++;
+
       } 
 
-      if(@prev_weight ~~ @curr_weight) {
-	my $val = $removed{$iter-1}{val};
-	push @unsuccessful, $val;
-      }
-
-      ### %removed and %stayed
-      if($currs==0) {
-	for my $i(0..$#testing) {
-	  $removed{$iter}{idx} = $i;
-	  $removed{$iter}{val} = $testing[$i];
-	}
-      } else {
-	for my $i(0..$#answer) {
-
-	}
-
-      }
-      ### @testing @un_test
 
       ###
       @prev_weight = @curr_weight;
