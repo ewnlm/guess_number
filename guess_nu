@@ -29,8 +29,31 @@
     $currs = $curr_weight[0]+$curr_weight[1];
     while($iter<2) { # $curr_weight[0]==4
       if($currs==0) {
+	if($prev==0) {
+	  push @unsuccessful, @testing;
+	  @testing = splice @un_test, 0, 4;
+	} else {
+	  for my $i(0..$#answer) {
+	    if(exists $removed{$iter-1}{$i}) {
+	      $testing[$i] = $removed{$iter-1}{$i};
+	    } else {
+	      $testing[$i] = shift @un_test;
+	    }
+	  }
+	}
+      } elsif($currs==4) {
+      } else {
+	my @x_site = grep {$answer[$_] =~ /X/i} 0..$#answer;
 
-      } 
+      }
+
+      if($curr_weight[0] == $prev_weight[0]) {
+
+      } elsif($curr_weight[0] > $prev_weight[0]) {
+
+      } else {
+
+      }
 
 
       ###
