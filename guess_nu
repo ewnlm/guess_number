@@ -28,6 +28,21 @@
     @curr_weight = split /[A|B]/, $AB;
     $currs = $curr_weight[0]+$curr_weight[1];
     while($iter<2) { # $curr_weight[0]==4
+      if($prevs > $currs) {
+	if($prev_weight[0] > $curr_weight[0]) {
+
+	} else {
+
+	}
+      } elsif($prevs == $currs) {
+
+      } else {
+
+      }
+
+
+
+
       if($currs==0) {
 	if($prev==0) {
 	  push @unsuccessful, @testing;
@@ -46,15 +61,6 @@
 	my @x_site = grep {$answer[$_] =~ /X/i} 0..$#answer;
 
       }
-
-      if($curr_weight[0] == $prev_weight[0]) {
-
-      } elsif($curr_weight[0] > $prev_weight[0]) {
-
-      } else {
-
-      }
-
 
       ###
       @prev_weight = @curr_weight;
