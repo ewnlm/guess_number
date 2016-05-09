@@ -3,9 +3,10 @@
   use experimental 'smartmatch';
   my @golden;
   my ($iter, $AB, $positively, $currs, $prevs);
-  my (@mask, @prev_weight, @curr_weight, @testing, @answer);
+  my (@unknown, @possible, $delta);
+  my (@prev_weight, @curr_weight, @testing, @answer);
   my (@un_test, @tested, @unsuccessful);
-  my (%candidate, %removed, %stayed);
+  my (%candidate, %removed);
   open FP, "golden.txt";
   while(<FP>) {
     chomp($_);
@@ -16,11 +17,10 @@
   for my $goal(@golden) {
     @mask = (0, 0, 0, 0);
     @answer = qw/X X X X/;
-    @testing = 0..3;
+    @testing = 1..4;
     @prev_weight = (0,0);
     $prevs = 0;
-    #%removed = ();
-    #%stayed = ();
+    %removed = ();
     @un_test = grep {!($_~~ @testing)} 0..9;
     $iter = 0;
     $AB = &your_result($goal, join "", @testing);
@@ -28,41 +28,27 @@
     @curr_weight = split /[A|B]/, $AB;
     $currs = $curr_weight[0]+$curr_weight[1];
     while($iter<2) { # $curr_weight[0]==4
-      if($prevs > $currs) {
-	if($prev_weight[0] > $curr_weight[0]) {
+      ### Exchange positions
+      if("C" ~~ @answer) {
 
-	} else {
+      }
 
-	}
-      } elsif($prevs == $currs) {
+      ### Test the new number
+      $delta = $prevs-$currs;
+      @unknown = grep {$answer[$_]=~/X/} 0..$#answer;
+      @possible = grep {$answer[$_]=~/P/} 0..$#answer;
+
+      if($currs=~/0/) {
+
+      } elsif($currs=~/1/) {
+
+      } elsif($currs=~/[2|3]/) {
 
       } else {
 
       }
 
-
-
-
-      if($currs==0) {
-	if($prev==0) {
-	  push @unsuccessful, @testing;
-	  @testing = splice @un_test, 0, 4;
-	} else {
-	  for my $i(0..$#answer) {
-	    if(exists $removed{$iter-1}{$i}) {
-	      $testing[$i] = $removed{$iter-1}{$i};
-	    } else {
-	      $testing[$i] = shift @un_test;
-	    }
-	  }
-	}
-      } elsif($currs==4) {
-      } else {
-	my @x_site = grep {$answer[$_] =~ /X/i} 0..$#answer;
-
-      }
-
-      ###
+      ### Post process
       @prev_weight = @curr_weight;
       $prevs = $currs;
       $AB = &your_result($goal, join "", @testing);
