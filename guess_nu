@@ -3,7 +3,7 @@
   use experimental 'smartmatch';
   my @golden;
   my ($iter, $AB, $positively, $currs, $prevs);
-  my (@unknown, @possible, $delta);
+  my (@unknown, @possible, $delta, @cat);
   my (@prev_weight, @curr_weight, @testing, @answer);
   my (@un_test, @tested, @unsuccessful);
   my (%candidate, %removed);
@@ -37,14 +37,29 @@
       $delta = $prevs-$currs;
       @unknown = grep {$answer[$_]=~/X/} 0..$#answer;
       @possible = grep {$answer[$_]=~/P/} 0..$#answer;
-
       if($currs=~/0/) {
-
+	if($prevs>$currs) {
+	  for my $i(keys %{$removed{$iter-1}}) {
+	    push @unsuccessful, $testing[$i];
+	    $testing[$i] = $removed{$iter-1}{$i};
+	    $answer[$i] = "P";
+	    ### 目前的值, 放到 @unsuccessful, 因為 0A0B
+	    ### 上一步的值, 放回 @testing
+	    ### 修改 @answer 為 P (Possible)
+	    ### 這個情況只有 $prevs=1, 修改兩個值, 才會發生
+	  }
+	} else {
+	  push @unsuccessful, @testing;
+	  @testing = splice @un_test, 0, 4;
+	  ### 只有 0 -> 0 這種情況
+	  ### 全部丟到 @unsuccessful 再從 @un_test 切新的值出來.
+	}
       } elsif($currs=~/1/) {
 
       } elsif($currs=~/[2|3]/) {
 
       } else {
+	### 不換數字, 只換位置
 
       }
 
