@@ -3,10 +3,10 @@
   use experimental 'smartmatch';
   my @golden;
   my ($iter, $AB, $positively, $currs, $prevs);
-  my (@unknown, @possible, $delta, @cat);
+  my (@unknown, @possible, $delta);
   my (@prev_weight, @curr_weight, @testing, @answer);
   my (@un_test, @tested, @unsuccessful);
-  my (%candidate, %removed);
+  my (@candidate, %removed);
   open FP, "golden.txt";
   while(<FP>) {
     chomp($_);
@@ -16,8 +16,8 @@
 
   for my $goal(@golden) {
     @mask = (0, 0, 0, 0);
-    @answer = qw/X X X X/;
     @testing = 1..4;
+    @answer = map {"X".$_} @testing;
     @prev_weight = (0,0);
     $prevs = 0;
     %removed = ();
@@ -28,33 +28,61 @@
     @curr_weight = split /[A|B]/, $AB;
     $currs = $curr_weight[0]+$curr_weight[1];
     while($iter<2) { # $curr_weight[0]==4
-      ### Exchange positions
-      if("C" ~~ @answer) {
-
-      }
-
-      ### Test the new number
+      ### 產生新的 @testing 
+      ### @answer 會有 X/P/C 產生
+      ### 更新順序
+      ### 1. @testing, 2. $removed{$iter}, 3. @answer
       $delta = $prevs-$currs;
       @unknown = grep {$answer[$_]=~/X/} 0..$#answer;
       @possible = grep {$answer[$_]=~/P/} 0..$#answer;
       if($currs=~/0/) {
 	if($prevs>$currs) {
-	  for my $i(keys %{$removed{$iter-1}}) {
+	  ### 1 >> 0
+	  ### prevs=1, 換兩個
+	  ### currs=0, 代表前兩個之一有正確答案.
+	  ### 把兩個換回來
+	  for my $i(0..$#testing) {
 	    push @unsuccessful, $testing[$i];
-	    $testing[$i] = $removed{$iter-1}{$i};
-	    $answer[$i] = "P";
-	    ### 目前的值, 放到 @unsuccessful, 因為 0A0B
-	    ### 上一步的值, 放回 @testing
-	    ### 修改 @answer 為 P (Possible)
-	    ### 這個情況只有 $prevs=1, 修改兩個值, 才會發生
+	    $removed{$iter}{$i} = $testing[$i];
+	    if(exists $removed{$iter-1}{$i}) {
+	      $testing[$i] = $removed{$iter-1}{$i};
+	      $answer[$i] = "P".$testing[$i];
+	    } else {
+	      ### 只把prevs=1 兩個換回來, 其餘不動, 免得影響判斷
+	    }
 	  }
 	} else {
-	  push @unsuccessful, @testing;
-	  @testing = splice @un_test, 0, 4;
-	  ### 只有 0 -> 0 這種情況
+	  ### 只有 0 > 0 這種情況
 	  ### 全部丟到 @unsuccessful 再從 @un_test 切新的值出來.
+	  push @unsuccessful, @testing;
+	  map {$removed{$iter}{$_} = $testing[$_]} 0..$#testing;
+	  @testing = splice @un_test, 0, 4;
+	  @answer = map {"X".$_} @testing;
 	}
       } elsif($currs=~/1/) {
+	if($prevs>$currs) {
+	  for my $i(0..$#testing) {
+	    if(exists $removed{$iter-1}{$i}) {
+	      if($prev_weight[0] > $curr_weight[0]) {
+		$answer[$i] = $removed{$iter-1}{$i}; ### 正確答案
+		$removed{$iter}{$i} = $testing[$i];
+		push @unsuccessful, $testing[$i];
+		$testing[$i] = pop @un_test;
+	      } else {
+		$answer[$i] = "C".$removed{$iter-1}{$i};
+		$removed{$iter}{$i} = $testing[$i];
+		push @unsuccessfu, $testing[$i];
+		$testing[$i] = pop @un_test;
+	      }
+	    } else {
+	      ### 只換一個, 保留原狀.
+	    }
+	  }
+	} elsif($prevs==$currs) {
+
+	} else {
+
+	}
 
       } elsif($currs=~/[2|3]/) {
 
@@ -62,6 +90,12 @@
 	### 不換數字, 只換位置
 
       }
+
+      ### Exchange positions
+      if("C" ~~ @answer) {
+
+      }
+
 
       ### Post process
       @prev_weight = @curr_weight;
