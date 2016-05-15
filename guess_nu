@@ -79,7 +79,29 @@
 	    }
 	  }
 	} elsif($prevs==$currs) {
-
+	  ### 1 > 1 
+	  ### prevs=1, 換了兩個
+	  ### currs=1, 結果不變, 剛剛兩個可能是或都不是.
+	  ### 先換回原先兩個, 只留一個
+	  for my $i(0..$#testing) {
+	    if(exists $removed{$iter-1}{$i}) {
+	      push @un_test, $testing[$i];
+	      $removed{$iter}{$i} = $testing[$i];
+	      $testing[$i] = $removed{$iter-1}{$i};
+	      $answer[$i] = "P".$testing[$i];
+	    } else {
+	      ### 保持原狀
+	    }
+	  }
+	  ### 以上，已經換回原狀.
+	  ### 現在要更換一個
+	  @possible = grep {$answer[$_] =~ /P/} 0..$#answer;
+	  $removed{$iter}{$possible[$#possible]} = $testing[$possible[$#possible]];
+	  unshift @un_test, $testing[$possible[$#possible]];
+	  $testing[$possible[$#possible]] = pop @un_test;
+	  $answer[$possible[$#possible]] = "X".$testing[$possible[$#possible]];
+	  push @un_test, shift @un_test;
+	  ### 兩個P , 變一個P
 	} else {
 
 	}
